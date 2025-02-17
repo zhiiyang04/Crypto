@@ -70,3 +70,8 @@ print("Encrypted Secret Key:", encrypted_key)
 # Person B decrypts the secret key using their private key
 decrypted_key = decrypt_secret_key(encrypted_key, private_key)
 print("Decrypted Secret Key:", decrypted_key)
+
+# Save the decrypted secret key to a file
+with open("secret_key.txt", "w") as key_file:
+    key_file.write(decrypted_key)
+print("Secret Key saved to secret_key.txt")
