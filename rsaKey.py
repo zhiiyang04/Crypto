@@ -28,7 +28,7 @@ def is_prime(n, k=5):
             return False
     return True
 
-def generate_prime(bits=512):
+def generate_prime(bits=2048):
     while True:
         p = random.getrandbits(bits)
         if is_prime(p):
@@ -40,6 +40,8 @@ def generate_rsa_keys():
     n = p * q
     phi = (p - 1) * (q - 1)
     e = 65537
+    while math.gcd(e, phi) != 1: 
+        e = random.randint(2, phi - 1)
     d = pow(e, -1, phi)  # Modular inverse
     return ((e, n), (d, n))
 
