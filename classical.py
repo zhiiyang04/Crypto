@@ -1,12 +1,6 @@
 import time
 import numpy as np
-from itertools import product
 
-import time
-import numpy as np
-from itertools import product
-
-# Playfair Cipher Implementation
 class PlayfairCipher:
     def __init__(self, key):
         self.key = key
@@ -62,22 +56,26 @@ class PlayfairCipher:
         return processed
     
     def encrypt(self, text):
+        start_time = time.time()
         text = self.process_text(text)
         pairs = [text[i:i+2] for i in range(0, len(text), 2)]
         print("\nPlayfair Encryption Steps:")
         encrypted_text = "".join(self.encrypt_pair(p[0], p[1]) for p in pairs)
-        print(f"Final Playfair Encrypted Text: {encrypted_text}\n")
+        print(f"Final Playfair Encrypted Text: {encrypted_text}")
+        print(f"Time taken for Playfair Encryption: {time.time() - start_time:.6f} seconds\n")
         return encrypted_text
     
     def decrypt(self, text):
+        start_time = time.time()
         pairs = [text[i:i+2] for i in range(0, len(text), 2)]
         print("\nPlayfair Decryption Steps:")
         decrypted_text = "".join(self.decrypt_pair(p[0], p[1]) for p in pairs)
-        print(f"Final Playfair Decrypted Text: {decrypted_text}\n")
+        print(f"Final Playfair Decrypted Text: {decrypted_text}")
+        print(f"Time taken for Playfair Decryption: {time.time() - start_time:.6f} seconds\n")
         return decrypted_text
 
-# Rail Fence Cipher Implementation
 def rail_fence_encrypt(text, depth):
+    start_time = time.time()
     rail = [['\n' for _ in range(len(text))] for _ in range(depth)]
     dir_down = False
     row, col = 0, 0
@@ -87,14 +85,15 @@ def rail_fence_encrypt(text, depth):
         rail[row][col] = char
         col += 1
         row += 1 if dir_down else -1
-    
     print("\nRail Fence Encryption Pattern:")
     for r in rail:
         print(" ".join(c if c != '\n' else ' ' for c in r))
-    
-    return "".join([c for row in rail for c in row if c != '\n'])
+    result = "".join([c for row in rail for c in row if c != '\n'])
+    print(f"Time taken for Rail Fence Encryption: {time.time() - start_time:.6f} seconds\n")
+    return result
 
 def rail_fence_decrypt(text, depth):
+    start_time = time.time()
     rail = [['\n' for _ in range(len(text))] for _ in range(depth)]
     dir_down = None
     row, col = 0, 0
@@ -106,18 +105,15 @@ def rail_fence_decrypt(text, depth):
         rail[row][col] = '*'
         col += 1
         row += 1 if dir_down else -1
-    
     index = 0
     for i in range(depth):
         for j in range(len(text)):
             if rail[i][j] == '*' and index < len(text):
                 rail[i][j] = text[index]
                 index += 1
-    
     print("\nRail Fence Decryption Pattern:")
     for r in rail:
         print(" ".join(c if c != '\n' else ' ' for c in r))
-    
     result = []
     row, col = 0, 0
     for i in range(len(text)):
@@ -128,33 +124,14 @@ def rail_fence_decrypt(text, depth):
         result.append(rail[row][col])
         col += 1
         row += 1 if dir_down else -1
+    print(f"Time taken for Rail Fence Decryption: {time.time() - start_time:.6f} seconds\n")
     return "".join(result)
 
-# Product Cipher Combination
-def product_cipher_encrypt(plain_text, playfair_key, rail_depth):
-    playfair = PlayfairCipher(playfair_key)
-    encrypted_playfair = playfair.encrypt(plain_text)
-    print(f"After Playfair Encryption: {encrypted_playfair}")
-    encrypted_final = rail_fence_encrypt(encrypted_playfair, rail_depth)
-    print(f"After Rail Fence Encryption: {encrypted_final}")
-    return encrypted_final
-
-def product_cipher_decrypt(cipher_text, playfair_key, rail_depth):
-    decrypted_rail = rail_fence_decrypt(cipher_text, rail_depth)
-    print(f"After Rail Fence Decryption: {decrypted_rail}")
-    playfair = PlayfairCipher(playfair_key)
-    decrypted_final = playfair.decrypt(decrypted_rail)
-    print(f"After Playfair Decryption: {decrypted_final}")
-    return decrypted_final
-
-# Command-line Input Handling
 if __name__ == "__main__":
     plaintext = input("Enter the text to encrypt: ")
     key = input("Enter Playfair key: ")
     depth = int(input("Enter Rail Fence depth: "))
-    
-    cipher_text = product_cipher_encrypt(plaintext, key, depth)
+    cipher_text = rail_fence_encrypt(PlayfairCipher(key).encrypt(plaintext), depth)
     print(f"Final Encrypted: {cipher_text}")
-    
-    decrypted_text = product_cipher_decrypt(cipher_text, key, depth)
+    decrypted_text = PlayfairCipher(key).decrypt(rail_fence_decrypt(cipher_text, depth))
     print(f"Final Decrypted: {decrypted_text}")
