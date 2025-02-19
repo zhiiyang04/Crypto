@@ -1,6 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import os
+import random
 
 # Load the secret key from file
 with open("secret_key.txt", "r") as key_file:
@@ -27,7 +28,13 @@ print("Original Encrypted Message (Hex):", ciphertext.hex())
 print("\n--- Introducing Bit Error in Ciphertext ---")
 
 corrupted_ciphertext = bytearray(ciphertext)
-corrupted_ciphertext[20] ^= 0x01  # Flip a single bit in the ciphertext
+
+# Pick a random byte index (excluding IV)
+random_index = random.randint(16, len(ciphertext) - 1)
+random_bit = 1 << random.randint(0, 7)  # Pick a random bit to flip in that byte
+
+# Flip the bit
+corrupted_ciphertext[random_index] ^= random_bit
 corrupted_ciphertext = bytes(corrupted_ciphertext)
 
 print("Corrupted Encrypted Message (Hex):", corrupted_ciphertext.hex())
